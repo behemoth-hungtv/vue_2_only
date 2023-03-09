@@ -1,3 +1,4 @@
+import app from "./main";
 import axios from "axios";
 import store from "./stores/global.js";
 
@@ -11,6 +12,7 @@ instance.interceptors.request.use(
   function (config) {
     const token = store.getters.token;
     config.headers = { authorization: token };
+    store.commit("setValidationErrors", {});
     return config;
   },
   function (error) {
@@ -27,8 +29,12 @@ instance.interceptors.response.use(
     return response;
   },
   function (error) {
-    // Any status codes that falls outside the range of 2xx cause this function to trigger
-    // Do something with response error
+    const data = error.response.data;
+    if (data.type == "validation")
+      store.commit("setValidationErrors", data.errors);
+    else if (error.response.status == 401)
+      app.$router.push("/login").catch(() => {});
+    app.$toast.error(data.message);
     return Promise.reject(error);
   }
 );

@@ -3,97 +3,36 @@
     <div id="">
       <div class="login-page">
         <transition name="fade">
-          <div v-if="!registerActive" class="wallpaper-login"></div>
+          <div class="wallpaper-login"></div>
         </transition>
         <div class="wallpaper-register"></div>
 
         <div class="container">
           <div class="row">
             <div class="col-lg-4 col-md-6 col-sm-8 mx-auto">
-              <div
-                v-if="!registerActive"
-                class="card login"
-                v-bind:class="{ error: emptyFields }"
-              >
+              <div class="card login">
                 <h1>Sign In</h1>
-                <form class="form-group">
-                  <input
-                    v-model="emailLogin"
-                    type="email"
-                    class="form-control"
-                    placeholder="Email"
-                    required
-                  />
-                  <input
-                    v-model="passwordLogin"
-                    type="password"
-                    class="form-control"
-                    placeholder="Password"
-                    required
-                  />
-                  <input
-                    type="submit"
-                    class="btn btn-primary"
-                    @click="doLogin"
-                  />
+                <form class="form-group" @submit.prevent="doLogin">
+                  <form-validator name="name" required
+                    ><input
+                      v-model="name"
+                      class="form-control"
+                      placeholder="Name"
+                      required
+                  /></form-validator>
+                  <form-validator name="password" required="">
+                    <input
+                      v-model="password"
+                      type="password"
+                      class="form-control"
+                      placeholder="Password"
+                      required
+                    />
+                  </form-validator>
+                  <input type="submit" class="btn btn-primary" />
                   <p>
                     Don't have an account?
-                    <a
-                      href="#"
-                      @click="
-                        (registerActive = !registerActive),
-                          (emptyFields = false)
-                      "
-                      >Sign up here</a
-                    >
-                  </p>
-                  <p><a href="#">Forgot your password?</a></p>
-                </form>
-              </div>
-
-              <div
-                v-else
-                class="card register"
-                v-bind:class="{ error: emptyFields }"
-              >
-                <h1>Sign Up</h1>
-                <form class="form-group">
-                  <input
-                    v-model="emailReg"
-                    type="email"
-                    class="form-control"
-                    placeholder="Email"
-                    required
-                  />
-                  <input
-                    v-model="passwordReg"
-                    type="password"
-                    class="form-control"
-                    placeholder="Password"
-                    required
-                  />
-                  <input
-                    v-model="confirmReg"
-                    type="password"
-                    class="form-control"
-                    placeholder="Confirm Password"
-                    required
-                  />
-                  <input
-                    type="submit"
-                    class="btn btn-primary"
-                    @click="doRegister"
-                  />
-                  <p>
-                    Already have an account?
-                    <a
-                      href="#"
-                      @click="
-                        (registerActive = !registerActive),
-                          (emptyFields = false)
-                      "
-                      >Sign in here</a
-                    >
+                    <router-link to="/register">Sign up here</router-link>
                   </p>
                 </form>
               </div>
@@ -106,40 +45,30 @@
 </template>
 
 <script>
+import FormValidator from "./FormValidator.vue";
+
 export default {
   name: "login",
+  components: {
+    FormValidator,
+  },
 
   data() {
     return {
-      registerActive: false,
-      emailLogin: "",
-      passwordLogin: "",
-      emailReg: "",
-      passwordReg: "",
-      confirmReg: "",
-      emptyFields: false,
+      name: "",
+      password: "",
     };
   },
 
   methods: {
     doLogin() {
-      if (this.emailLogin === "" || this.passwordLogin === "") {
-        this.emptyFields = true;
-      } else {
-        alert("You are now logged in");
-      }
-    },
-
-    doRegister() {
-      if (
-        this.emailReg === "" ||
-        this.passwordReg === "" ||
-        this.confirmReg === ""
-      ) {
-        this.emptyFields = true;
-      } else {
-        alert("You are now registered");
-      }
+      this.axios
+        .post("/login", {
+          name: this.name,
+          password: this.password,
+        })
+        .then(() => this.$router.push("/"))
+        .catch(() => {});
     },
   },
 };

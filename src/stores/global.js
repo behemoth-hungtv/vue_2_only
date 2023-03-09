@@ -12,6 +12,7 @@ const store = new Vuex.Store({
   state: {
     count: 1,
     token: "",
+    validationErrors: {},
   },
   mutations: {
     increment(state) {
@@ -20,10 +21,16 @@ const store = new Vuex.Store({
     setToken(state, value) {
       state.token = value;
     },
+    setValidationErrors(state, payload) {
+      state.validationErrors = payload;
+    },
   },
   getters: {
     token(state) {
       return state.token;
+    },
+    getErrors: (state) => (name) => {
+      return state.validationErrors[name] ?? [];
     },
   },
 
